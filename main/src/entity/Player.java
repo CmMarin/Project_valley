@@ -13,18 +13,27 @@ public class Player extends Entity{
     GamePanel gp;
     KeyHandler keyH;
 
+    public final int screenX;
+    public final int screenY;
+
     public Player (GamePanel gp, KeyHandler keyH){
 
         this.gp = gp;
         this.keyH = keyH;
+
+        screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
+        screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
+
+        hitbox = new Rectangle(8,25,gp.tileSize/2,gp.tileSize/2);
+
         setDefaultValues();
         getPlayerImage();
     }
 
     public void setDefaultValues(){
-        x = 100;
-        y = 100;
-        speed = 3;
+        worldX = gp.tileSize * 20;
+        worldY = gp.tileSize * 20;
+        speed = 8;
         direction = "down";
     }
 
@@ -43,18 +52,41 @@ public class Player extends Entity{
     }
 
     public void update(){
-        if(keyH.upPressed == true){
+        if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed){
+
+        if(keyH.upPressed){
             direction = "up";
-            y -= speed;
+//            worldY -= speed;
         }else if (keyH.downPressed){
             direction = "down";
-            y += speed;
+//            worldY += speed;
         }else if(keyH.leftPressed){
             direction = "left";
-            x -= speed;
+//            worldX -= speed;
         }else if(keyH.rightPressed){
             direction = "right";
-            x += speed;
+//            worldX += speed;
+        }
+
+        //Tile collision check
+        collisionOn = false;
+        gp.cChecker.checkTile(this);
+
+        if(!collisionOn){
+            switch (direction){
+                case "up":
+                    worldY -= speed;
+                    break;
+                case "down":
+                    worldY += speed;
+                    break;
+                case "left":
+                    worldX -= speed;
+                    break;
+                case "right":
+                    worldX += speed;
+                    break;
+            }
         }
 
         spriteCounter++;
@@ -66,6 +98,7 @@ public class Player extends Entity{
             }
             spriteCounter = 0;
         }
+    }
     }
 
     public void draw(Graphics2D g2){
@@ -108,6 +141,6 @@ public class Player extends Entity{
                 break;
         }
 
-        g2.drawImage(image, x, y, gp.tileSize*2, gp.tileSize*2, null);
+        g2.drawImage(image, screenX, screenY, (gp.tileSize/8)*7, (gp.tileSize/8)*7, null);
     }
 }
